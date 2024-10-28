@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  clerkUserId String?  @unique
+  name        String
+  imageUrl    String?  @db.Text
+  email       String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id                 String            @id @default(uuid())
+  title              String
+  totalDurationHours Float?            @default(0)
+  thumbnail          String
+  description        String
+  totalStudents      Int?              @default(0)
+  course_categories  Course_Catagory[]
+  ratings            Float?            @default(0)
+  whatYouWillLearn   String[]
+  whatYouWillGet     String[]
+  chapters           Chapter[]
+  isUnlocked         Boolean           @default(false)
+  price              Float
+  discountedPrice    Float?
+  course_CatagoryId  String
+  isBestSeller       Boolean?          @default(false)
+  instructor         Instructor        @relation(fields: [instructorId], references: [id])
+  instructorId       String
+  reviews            Review[]
+}
+
+model Chapter {
+  id          String  @id @default(uuid())
+  title       String
+  description String
+  video       String
+  thumbnail   String
+  isUnlocked  Boolean @default(false)
+  course      Course? @relation(fields: [courseId], references: [id])
+  courseId    String?
+}
+
+model Course_Catagory {
+  id      String   @id @default(uuid())
+  courses Course[]
+}
+
+model Instructor {
+  id      String   @id @default(uuid())
+  courses Course[]
+}
+
+model Review {
+  id          String  @id @default(uuid())
+  ratings     Float?  @default(0)
+  description String?
+  likes       Int?    @default(0)
+  disLikes    Int?    @default(0)
+  course      Course  @relation(fields: [courseId], references: [id])
+  courseId    String
+}
